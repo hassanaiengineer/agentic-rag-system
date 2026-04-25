@@ -1,0 +1,78 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual Environment
+venv/
+.venv/
+env/
+ENV/
+
+# Data and Persistence
+rag_system/data/
+backend/data/
+pdfs/
+
+# Env Files
+.env
+
+# Frontend (Node)
+node_modules/
+dist/
+dist-ssr/
+*.local
+
+# IDEs
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# --- Proprietary Core Logic (not for public repo) ---
+# Agent & graph logic
+backend/app/agents/graph.py
+
+# All service implementations
+backend/app/services/retrieval.py
+backend/app/services/llm.py
+backend/app/services/ingestion.py
+backend/app/services/chunking.py
+backend/app/services/embedding.py
+backend/app/services/vector_store.py
+backend/app/services/bm25_index.py
+backend/app/services/prompt_engine.py
+backend/app/services/qa_engine.py
+
+# API route logic
+backend/app/api/routes.py
+
+# App entry point
+backend/app/main.py
