@@ -26,7 +26,7 @@ A production-grade, multi-tenant Document Intelligence system featuring Agentic 
 ## 🏗️ Architecture
 
 **Backend (`FastAPI` - Python 3.12):**
-- `app/agents/graph.py`: LangGraph State Machine (Retrieve -> Grade -> Expand -> Generate).
+- `app/agents/graph.py`: LangGraph State Machine (Retrieve > Grade > Expand > Generate).
 - `app/services/ingestion.py`: Hybrid extraction (PyMuPDF + Tesseract OCR fallback) + Edge Case handling.
 - `app/services/chunking.py`: Context-aware boundary chunking preserving `page_number` logic.
 - `app/services/vector_store.py`: Tenant-scoped ChromaDB persistence.
