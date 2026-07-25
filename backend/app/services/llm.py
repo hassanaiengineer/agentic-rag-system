@@ -67,3 +67,25 @@ class LLMService:
                     "message": "Response was blocked by safety filters."
                 })
             raise
+
+    def transcribe(self, audio_bytes: bytes, mime_type: str = "audio/wav") -> str:
+        """Transcribe a short audio clip to text using Gemini's multimodal model.
+
+        Accepts standard audio containers (WAV/MP3/OGG/FLAC/AAC). The browser records
+        WAV specifically because Gemini does not accept webm/opus.
+        """
+        response = self.model.generate_content(
+            [
+                (
+                    "Transcribe the following audio recording to plain text. "
+                    "Return ONLY the exact transcription with no quotes, labels, or commentary. "
+                    "If there is no discernible speech, return an empty string."
+                ),
+                {"mime_type": mime_type, "data": audio_bytes},
+            ],
+            generation_config={"temperature": 0.0, "max_output_tokens": 512},
+            request_options={"timeout": self.settings.gemini_timeout_seconds},
+        )
+        if not response.candidates or not response.parts:
+            return ""
+        return (response.text or "").strip()

@@ -176,6 +176,26 @@ def _build_sources(documents: list, limit: int = 6) -> list[dict]:
     return ordered[:limit]
 
 
+@router.post("/transcribe")
+async def transcribe_audio(
+    file: UploadFile = File(...),
+    container: ServiceContainer = Depends(get_container),
+    current_user: User = Depends(get_current_user),
+) -> dict[str, str]:
+    data = await file.read()
+    if not data:
+        raise HTTPException(status_code=400, detail="Empty audio upload")
+    if len(data) > 20 * 1024 * 1024:
+        raise HTTPException(status_code=413, detail="Audio too large (max 20MB)")
+    mime_type = file.content_type or "audio/wav"
+    try:
+        text = container.llm.transcribe(data, mime_type=mime_type)
+    except Exception as e:
+        logger.error("transcription_failed", extra={"extra": {"error": str(e)}})
+        raise HTTPException(status_code=502, detail="Transcription failed")
+    return {"text": text}
+
+
 async def generate_stream(
     request: QueryRequest, container: ServiceContainer, current_user: User
 ) -> AsyncGenerator[str, None]:

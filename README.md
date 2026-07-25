@@ -60,6 +60,9 @@ Fusion (RRF), and a premium SaaS dashboard with real-time token streaming. Its g
 - **ChatPDF-style Split-Pane Workspace**:
   - Render the actual PDF alongside the chat (`react-pdf`). Clicking a citation jumps the viewer
     straight to the cited page. Answers stream in with clickable page-level source chips.
+- **Voice Search (Gemini Speech-to-Text)**:
+  - Ask by voice — the browser records WAV audio (Web Audio API), Gemini transcribes it, and the
+    query flows straight into the agentic pipeline. The agent answers in chat as usual.
 - **Agentic RAG Orchestration (`LangGraph`)**: 
   - **Self-Correction:** The `Grade Context` node utilizes structured LLM outputs to evaluate retrieved context relevance. If relevance is low, the graph autonomously routes to an `Expand Search` node to generate diverse fallback queries (Semantic + Keyword) before retrying.
 - **Premium SaaS Frontend**:
@@ -182,6 +185,7 @@ All routes except `/health`, `/auth/register`, and `/auth/login` require a
 - `POST   /upload` — multipart PDF/DOCX upload (indexed into the caller's tenant)
 - `GET    /documents` — list the caller's documents
 - `GET    /files/{document_name}` — stream the raw PDF (powers the viewer)
+- `POST   /transcribe` — multipart WAV audio → `{ text }` (Gemini speech-to-text for voice search)
 - `DELETE /documents/{document_name}` — remove a document + its index
 
 ### Admin (requires `role: admin`)
