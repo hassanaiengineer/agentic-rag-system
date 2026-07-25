@@ -1,8 +1,49 @@
-# Document Intelligence Engine (Agentic RAG MVP)
+<div align="center">
 
-A production-grade, multi-tenant Document Intelligence system featuring Agentic LangGraph orchestration, true Reciprocal Rank Fusion (RRF), and a premium React SaaS dashboard with real-time streaming token generation.
+# 🧠 RAG.ai — Document Intelligence Engine
+
+### Agentic RAG · Hybrid Retrieval · Real-time Streaming
+
+**Chat with your documents — grounded, cited, and instant.**
+
+<p>
+  <img alt="Python"      src="https://img.shields.io/badge/Python-3.12-3776AB?style=flat&logo=python&logoColor=white">
+  <img alt="FastAPI"     src="https://img.shields.io/badge/FastAPI-0.115-009688?style=flat&logo=fastapi&logoColor=white">
+  <img alt="React"       src="https://img.shields.io/badge/React-18-61DAFB?style=flat&logo=react&logoColor=black">
+  <img alt="TypeScript"  src="https://img.shields.io/badge/TypeScript-5-3178C6?style=flat&logo=typescript&logoColor=white">
+  <img alt="Tailwind"    src="https://img.shields.io/badge/Tailwind-3-06B6D4?style=flat&logo=tailwindcss&logoColor=white">
+</p>
+<p>
+  <img alt="LangGraph"   src="https://img.shields.io/badge/LangGraph-Agentic-1C3C3C?style=flat">
+  <img alt="ChromaDB"    src="https://img.shields.io/badge/ChromaDB-Vectors-FF6B6B?style=flat">
+  <img alt="BM25s"       src="https://img.shields.io/badge/BM25s-Lexical-8E44AD?style=flat">
+  <img alt="Gemini"      src="https://img.shields.io/badge/Google%20Gemini-2.5%20Flash-4285F4?style=flat&logo=googlegemini&logoColor=white">
+  <img alt="Docker"      src="https://img.shields.io/badge/Docker-Compose-2496ED?style=flat&logo=docker&logoColor=white">
+</p>
+<p>
+  <img alt="frontend build" src="https://img.shields.io/badge/frontend%20build-passing-brightgreen?style=flat">
+  <img alt="backend"        src="https://img.shields.io/badge/backend-passing-brightgreen?style=flat">
+  <img alt="auth"           src="https://img.shields.io/badge/auth-JWT-success?style=flat">
+  <img alt="multi-tenant"   src="https://img.shields.io/badge/multi--tenant-yes-brightgreen?style=flat">
+  <img alt="status"         src="https://img.shields.io/badge/status-MVP-blue?style=flat">
+</p>
+
+</div>
+
+**RAG.ai** is a [FastAPI](https://fastapi.tiangolo.com/) + [React](https://react.dev/), multi-tenant
+**Retrieval-Augmented Generation** platform for chatting with your own documents. It combines
+agentic [LangGraph](https://langchain-ai.github.io/langgraph/) orchestration, true Reciprocal Rank
+Fusion (RRF), and a premium SaaS dashboard with real-time token streaming. Its goals are as follows:
+
+- **Grounded, cited answers** — every response is drawn strictly from your documents, with clickable page-level citations;
+- **Self-correcting agentic retrieval** — the agent grades its own context and expands the search when evidence falls short;
+- **A complete, shareable SaaS MVP** — JWT auth, per-user isolation, and an admin console that exposes the RAG internals end to end.
+
+<div align="center">
 
 ![RAG.ai Dashboard](dashboard.png)
+
+</div>
 
 ## 🚀 Key Architectural Upgrades
 
