@@ -4,6 +4,7 @@ import { Search, Database, CheckCircle, RefreshCcw, BrainCircuit } from 'lucide-
 import { cn } from '../lib/utils';
 
 const steps = [
+  { id: 'classify', label: 'Understanding request', icon: Search },
   { id: 'retrieve', label: 'Retrieving context', icon: Database },
   { id: 'grade_context', label: 'Grading relevance', icon: CheckCircle },
   { id: 'expand_search', label: 'Improving search', icon: RefreshCcw },

@@ -20,5 +20,7 @@ langchain-core==0.3.15
 langchain-google-genai==2.0.7
 bm25s
 PyPDF2
+PyJWT==2.9.0
+email-validator==2.2.0
 pytest
 pytest-asyncio

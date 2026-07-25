@@ -5,12 +5,14 @@ services:
     build:
       context: ./backend
     ports:
-      - "8000:8000"
+      - "8001:8000"
     volumes:
       - ./backend/data:/app/backend/data
       - ./backend/app:/app/backend/app
     environment:
       - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - JWT_SECRET=${JWT_SECRET:-dev-insecure-secret-change-me}
+      - CORS_ORIGINS=${CORS_ORIGINS:-*}
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
       interval: 10s
@@ -26,7 +28,7 @@ services:
     volumes:
       - ./frontend/src:/app/frontend/src
     environment:
-      - VITE_API_URL=http://localhost:8000
+      - VITE_API_URL=http://localhost:8001
     depends_on:
       backend:
         condition: service_healthy

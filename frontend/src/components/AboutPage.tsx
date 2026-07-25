@@ -1,17 +1,17 @@
 import React from 'react';
-import { useUIStore } from '../store/useUIStore';
+import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Rocket, Zap, Shield, Search, BrainCircuit, Code2 } from 'lucide-react';
 
 export const AboutPage: React.FC = () => {
-  const setView = useUIStore((state) => state.setView);
+  const navigate = useNavigate();
 
   return (
     <div className="flex-1 overflow-y-auto bg-slate-50/50">
       <div className="max-w-4xl mx-auto py-12 px-8">
-        
+
         {/* Header / Back Button */}
-        <button 
-          onClick={() => setView('workspace')}
+        <button
+          onClick={() => navigate('/')}
           className="flex items-center gap-2 text-sm font-semibold text-slate-500 hover:text-blue-600 transition-colors mb-10"
         >
           <ArrowLeft className="w-4 h-4" />
@@ -71,7 +71,7 @@ export const AboutPage: React.FC = () => {
             </div>
             <h3 className="text-lg font-bold text-slate-900 mb-2">Enterprise Multi-Tenancy</h3>
             <p className="text-sm text-slate-600 leading-relaxed">
-              Strict data isolation. Every uploaded document, vector embedding, and keyword index is hard-partitioned by an X-Tenant-ID header. User A can never accidentally query User B's knowledge base.
+              Strict data isolation. Every account authenticates via JWT and is mapped to its own tenant, so every uploaded document, vector embedding, and keyword index is hard-partitioned. User A can never accidentally query User B's knowledge base.
             </p>
           </div>
 

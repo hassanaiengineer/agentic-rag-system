@@ -55,24 +55,3 @@ dist-ssr/
 .Trashes
 ehthumbs.db
 Thumbs.db
-
-# --- Proprietary Core Logic (not for public repo) ---
-# Agent & graph logic
-backend/app/agents/graph.py
-
-# All service implementations
-backend/app/services/retrieval.py
-backend/app/services/llm.py
-backend/app/services/ingestion.py
-backend/app/services/chunking.py
-backend/app/services/embedding.py
-backend/app/services/vector_store.py
-backend/app/services/bm25_index.py
-backend/app/services/prompt_engine.py
-backend/app/services/qa_engine.py
-
-# API route logic
-backend/app/api/routes.py
-
-# App entry point
-backend/app/main.py

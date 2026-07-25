@@ -1,60 +1,74 @@
 import { useUIStore } from '../store/useUIStore';
-
-const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+import { API_BASE, authHeaders } from '../services/apiClient';
 
 export const useStreamingChat = () => {
-  const { 
-    addMessage, 
-    updateLastAssistantMessage, 
-    setStreaming, 
-    setThinkingStep, 
-    tenantId 
+  const {
+    addMessage,
+    updateLastAssistantMessage,
+    setLastAssistantSources,
+    setStreaming,
+    setThinkingStep,
+    selectDocument,
+    jumpToPage,
   } = useUIStore();
 
   const sendMessage = async (query: string) => {
     addMessage({ role: 'user', content: query });
     addMessage({ role: 'assistant', content: '' });
     setStreaming(true);
-    setThinkingStep('retrieve');
+    setThinkingStep('classify');
 
     try {
-      const response = await fetch(`${BASE_URL}/query`, {
+      const response = await fetch(`${API_BASE}/query`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'X-Tenant-ID': tenantId,
+          ...authHeaders(),
         },
         body: JSON.stringify({ query, mode: 'qa' }),
       });
 
-      if (!response.body) throw new Error('No response body');
+      if (!response.ok || !response.body) throw new Error('No response body');
 
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
       let accumulatedAnswer = '';
+      let buffer = '';
+
+      const handleData = (dataStr: string) => {
+        if (dataStr === '[DONE]') return;
+        try {
+          const data = JSON.parse(dataStr);
+          if (data.type === 'node') {
+            setThinkingStep(data.node_name);
+          } else if (data.type === 'sources') {
+            setLastAssistantSources(data.sources);
+            // Focus the top-cited document/page in the PDF pane.
+            if (data.sources?.length) {
+              const top = data.sources[0];
+              selectDocument(top.document);
+              jumpToPage(top.page_number || 1);
+            }
+          } else if (data.type === 'token') {
+            accumulatedAnswer += data.content;
+            updateLastAssistantMessage(accumulatedAnswer);
+          }
+        } catch (e) {
+          console.error('Error parsing SSE chunk', e);
+        }
+      };
 
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
 
-        const chunk = decoder.decode(value, { stream: true });
-        const lines = chunk.split('\n');
-
-        for (const line of lines) {
-          if (!line.startsWith('data: ')) continue;
-          const dataStr = line.slice(6).trim();
-          if (dataStr === '[DONE]') break;
-
-          try {
-            const data = JSON.parse(dataStr);
-            if (data.type === 'node') {
-              setThinkingStep(data.node_name);
-            } else if (data.type === 'token') {
-              accumulatedAnswer += data.content;
-              updateLastAssistantMessage(accumulatedAnswer);
-            }
-          } catch (e) {
-            console.error('Error parsing NDJSON chunk', e);
+        buffer += decoder.decode(value, { stream: true });
+        // SSE frames are separated by a blank line.
+        const frames = buffer.split('\n\n');
+        buffer = frames.pop() ?? '';
+        for (const frame of frames) {
+          for (const line of frame.split('\n')) {
+            if (line.startsWith('data: ')) handleData(line.slice(6).trim());
           }
         }
       }

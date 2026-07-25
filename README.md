@@ -6,6 +6,19 @@ A production-grade, multi-tenant Document Intelligence system featuring Agentic 
 
 ## 🚀 Key Architectural Upgrades
 
+- **Full SaaS Auth + Multi-Tenancy (`JWT`)**:
+  - Self-contained email/password authentication (JWT + SQLite, PBKDF2-hashed) — no external
+    auth provider or extra services to run. Each account is mapped to an isolated tenant, so
+    documents, vectors, and lexical indexes are hard-partitioned per user.
+  - Ships with seeded **demo** and **admin** accounts so the demo works the moment it boots.
+- **Admin Console**:
+  - **User management** (activate / deactivate / delete), **usage analytics** (queries over time,
+    intent breakdown, latency, per-tenant document counts), live **RAG config tuning**
+    (fusion α, top-K, chunk size/overlap, grader toggle), and a **Retrieval Inspector** that shows
+    the raw semantic pool, BM25 pool, and fused RRF scores side by side.
+- **ChatPDF-style Split-Pane Workspace**:
+  - Render the actual PDF alongside the chat (`react-pdf`). Clicking a citation jumps the viewer
+    straight to the cited page. Answers stream in with clickable page-level source chips.
 - **Agentic RAG Orchestration (`LangGraph`)**: 
   - **Self-Correction:** The `Grade Context` node utilizes structured LLM outputs to evaluate retrieved context relevance. If relevance is low, the graph autonomously routes to an `Expand Search` node to generate diverse fallback queries (Semantic + Keyword) before retrying.
 - **Premium SaaS Frontend**:
@@ -26,15 +39,22 @@ A production-grade, multi-tenant Document Intelligence system featuring Agentic 
 ## 🏗️ Architecture
 
 **Backend (`FastAPI` - Python 3.12):**
-- `app/agents/graph.py`: LangGraph State Machine (Retrieve > Grade > Expand > Generate).
+- `app/auth/`: JWT auth (PBKDF2 hashing), user service, `get_current_user` / `require_admin` deps.
+- `app/admin/routes.py`: Admin console APIs (users, analytics, config, retrieval inspector).
+- `app/db/database.py`: SQLite (users, query events, runtime config).
+- `app/services/runtime_config.py`: Live-tunable RAG knobs persisted to SQLite.
+- `app/agents/graph.py`: LangGraph State Machine (Classify -> Retrieve -> Grade -> Expand -> Generate).
 - `app/services/ingestion.py`: Hybrid extraction (PyMuPDF + Tesseract OCR fallback) + Edge Case handling.
 - `app/services/chunking.py`: Context-aware boundary chunking preserving `page_number` logic.
 - `app/services/vector_store.py`: Tenant-scoped ChromaDB persistence.
 - `app/services/retrieval.py`: Reciprocal Rank Fusion (Semantic + Keyword).
 
 **Frontend (`React + Vite + Tailwind`):**
-- `src/store/useUIStore.ts`: Global state (Zustand) for chat history and active tenant.
-- `src/hooks/useStreamingChat.ts`: SSE parser that converts NDJSON into typing effects.
+- `src/store/useAuthStore.ts` / `useUIStore.ts`: Auth session + chat/viewer state (Zustand).
+- `src/pages/`: `Login`, `Workspace` (split-pane), `Admin` (console).
+- `src/components/PdfViewer.tsx`: `react-pdf` viewer with citation-driven page jumps.
+- `src/components/admin/`: Users, Analytics (`recharts`), RAG Config, Retrieval Inspector.
+- `src/hooks/useStreamingChat.ts`: Buffered SSE parser (nodes → sources → tokens).
 - `src/components/ThinkingTimeline.tsx`: Visual feedback for AI agent actions.
 
 ---
@@ -46,16 +66,27 @@ The easiest way to run the entire stack (Frontend + Backend) is using Docker Com
 1. Create env file at `rag_system/.env`:
 ```env
 GEMINI_API_KEY=<your_key_here>
+JWT_SECRET=change-me-to-a-long-random-string
+CORS_ORIGINS=*
 ```
 
 2. Build and run the stack:
 ```bash
-docker-compose up --build
+docker-compose up
 ```
 
 3. Access the application:
 - **Frontend Dashboard:** `http://localhost:5173`
-- **Backend API Docs:** `http://localhost:8000/docs`
+- **Backend API Docs:** `http://localhost:8001/docs`
+
+### 🔑 Demo Accounts (seeded automatically)
+
+| Role  | Email          | Password   | Notes                                             |
+|-------|----------------|------------|---------------------------------------------------|
+| User  | `demo@rag.ai`  | `demo123`  | Pinned to the `system_default` tenant (pre-loaded docs) |
+| Admin | `admin@rag.ai` | `admin123` | Access to the Admin Console                       |
+
+> Override these via `SEED_DEMO_*` / `SEED_ADMIN_*` env vars. **Change `JWT_SECRET` before deploying.**
 
 ---
 
@@ -97,14 +128,35 @@ npm run dev
 
 ## 📡 API Reference
 
+All routes except `/health`, `/auth/register`, and `/auth/login` require a
+`Authorization: Bearer <token>` header. The tenant is derived from the authenticated user — no
+`X-Tenant-ID` header needed.
+
+### Auth
+- `POST /auth/register` → `{ email, password, name }` → `{ access_token, user }`
+- `POST /auth/login` → `{ email, password }` → `{ access_token, user }`
+- `GET  /auth/me` → current user
+
+### Documents
+- `POST   /upload` — multipart PDF/DOCX upload (indexed into the caller's tenant)
+- `GET    /documents` — list the caller's documents
+- `GET    /files/{document_name}` — stream the raw PDF (powers the viewer)
+- `DELETE /documents/{document_name}` — remove a document + its index
+
+### Admin (requires `role: admin`)
+- `GET    /admin/users`, `PATCH /admin/users/{id}`, `DELETE /admin/users/{id}`
+- `GET    /admin/analytics` — usage + per-tenant stats
+- `GET/PUT /admin/config` — live RAG config (fusion α, top-K, chunk sizes, grader toggle)
+- `POST   /admin/retrieval-inspect` — `{ query, tenant_id }` → semantic / BM25 / fused RRF pools
+
 ### `POST /query` (Streaming Endpoint)
-Asynchronous stream yielding LangGraph node traversal states, followed by text tokens.
-- **Headers:** `X-Tenant-ID: <tenant_string>`
+Asynchronous stream yielding LangGraph node traversal states, citations, then text tokens.
 
 Stream Output (SSE `text/event-stream`):
 ```text
 data: {"type": "node", "node_name": "retrieve"}
 data: {"type": "node", "node_name": "grade_context"}
+data: {"type": "sources", "sources": [{"document": "contract.pdf", "page_number": 3, ...}]}
 data: {"type": "token", "content": "The "}
 data: {"type": "token", "content": "termination "}
 data: [DONE]
