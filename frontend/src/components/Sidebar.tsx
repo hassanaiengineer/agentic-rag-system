@@ -101,7 +101,7 @@ export const Sidebar: React.FC = () => {
           <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
             <LayoutDashboard className="w-5 h-5 text-white" />
           </div>
-          <span className="font-bold text-slate-900 tracking-tight text-lg italic">RAG.ai</span>
+          <span className="font-bold text-blue-600 tracking-tight text-lg italic">RAG.ai</span>
         </div>
 
         <nav className="space-y-1">

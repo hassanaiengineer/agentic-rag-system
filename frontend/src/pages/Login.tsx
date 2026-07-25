@@ -90,7 +90,7 @@ export const Login: React.FC = () => {
             <div className="w-9 h-9 bg-blue-600 rounded-xl flex items-center justify-center">
               <FileText className="w-5 h-5 text-white" />
             </div>
-            <span className="font-bold text-xl tracking-tight italic text-slate-900">RAG.ai</span>
+            <span className="font-bold text-xl tracking-tight italic text-blue-600">RAG.ai</span>
           </div>
 
           <h2 className="text-2xl font-bold text-slate-900 tracking-tight">

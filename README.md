@@ -1,6 +1,6 @@
 <div align="center">
 
-# 🧠 RAG.ai — Document Intelligence Engine
+<img src="https://img.shields.io/badge/🧠%20RAG.ai%20%E2%80%94%20Document%20Intelligence%20Engine-2563EB?style=for-the-badge&labelColor=2563EB" alt="RAG.ai — Document Intelligence Engine" height="44">
 
 ### Agentic RAG · Hybrid Retrieval · Real-time Streaming
 
