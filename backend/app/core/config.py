@@ -44,7 +44,8 @@ class Settings(BaseSettings):
     pdf_density_threshold: float = 0.0005
 
     gemini_model_name: str = "gemini-2.5-flash"
-    gemini_temperature: float = 0.2
+    # Low temperature keeps answers grounded and reduces embellishment / hallucination.
+    gemini_temperature: float = 0.0
     gemini_timeout_seconds: int = 45
 
     model_config = SettingsConfigDict(

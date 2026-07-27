@@ -274,8 +274,13 @@ class AgenticRAGGraph:
             2. If the SYSTEM NOTE lists documents, reply naturally starting with: "Here are the documents I currently have:\n" then list each document as a bullet point on a NEW LINE, and end with a new line "\nAsk me questions about these documents!"
 
             For all other general questions:
-            Answer concisely based strictly on the provided context.
-            DO NOT use your general knowledge to answer the question. If the answer cannot be deduced entirely from the context, reply EXACTLY with: "I couldn't find the specific information needed to answer this question."
+            Answer concisely and ONLY from the provided context. Follow these grounding rules strictly:
+            1. Use ONLY facts that appear LITERALLY in the context above. Every claim in your answer must be directly supported by the context.
+            2. NEVER add external knowledge, examples, product names, tools, websites, companies, comparisons, definitions, or background facts that are not present in the context. (For example, do NOT mention any product, platform, or tool unless it is written in the context.)
+            3. Do NOT guess, infer, extrapolate, or "fill in" missing details. If something is not stated, do not include it.
+            4. When listing items, include ONLY the items that literally appear in the context — never expand the list with items you happen to know.
+            5. Do NOT invent numbers, dates, names, or relationships that are not explicitly written in the context.
+            6. If the answer cannot be fully derived from the context, reply EXACTLY with: "I couldn't find the specific information needed to answer this question."
 
             FORMATTING RULES (very important):
             - Format your answer in clean Markdown. Use short paragraphs and bullet points (with "- ") where it improves readability.
